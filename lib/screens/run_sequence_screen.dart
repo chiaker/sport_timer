@@ -140,10 +140,10 @@ class _RunSequenceScreenState extends State<RunSequenceScreen>
         child: Column(
           children: [
             Container(
-              height: 160,
+              height: 180,
               decoration: BoxDecoration(
-                color: Color(step.colorValue).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
+                color: Color(step.colorValue).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
                 child: Column(
@@ -151,13 +151,14 @@ class _RunSequenceScreenState extends State<RunSequenceScreen>
                   children: [
                     Text(
                       step.label,
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _format(_remainingSeconds()),
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: Color(step.colorValue),
                       ),
                     ),
@@ -165,33 +166,33 @@ class _RunSequenceScreenState extends State<RunSequenceScreen>
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(value: _progress()),
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(minHeight: 8, value: _progress()),
+            ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
                   iconSize: 40,
-                  icon: const Icon(Icons.skip_previous),
+                  icon: const Icon(Icons.skip_previous_rounded),
                   onPressed: _prev,
                 ),
                 const SizedBox(width: 16),
-                ElevatedButton.icon(
+                FilledButton.icon(
                   onPressed: _isRunning ? _pause : _start,
-                  icon: Icon(_isRunning ? Icons.pause : Icons.play_arrow),
-                  label: Text(_isRunning ? 'Пауза' : 'Старт'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
+                  icon: Icon(
+                    _isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
                   ),
+                  label: Text(_isRunning ? 'Пауза' : 'Старт'),
+                  style: const ButtonStyle(),
                 ),
                 const SizedBox(width: 16),
                 IconButton(
                   iconSize: 40,
-                  icon: const Icon(Icons.skip_next),
+                  icon: const Icon(Icons.skip_next_rounded),
                   onPressed: _advance,
                 ),
               ],
@@ -213,7 +214,7 @@ class _RunSequenceScreenState extends State<RunSequenceScreen>
                     backgroundColor: i == _currentStepIndex
                         ? Color(
                             widget.sequence.steps[i].colorValue,
-                          ).withValues(alpha: 0.3)
+                          ).withValues(alpha: 0.2)
                         : null,
                   ),
               ],

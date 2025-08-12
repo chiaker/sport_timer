@@ -16,70 +16,102 @@ class _SequenceListScreenState extends State<SequenceListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Последовательности таймеров')),
-      body: ValueListenableBuilder(
-        valueListenable: Hive.box<TimerSequence>(
-          StorageService.sequencesBoxName,
-        ).listenable(),
-        builder: (context, Box<TimerSequence> box, _) {
-          final sequences = box.values.toList(growable: false);
-          if (sequences.isEmpty) {
-            return const Center(
-              child: Text('Нет сохранённых последовательностей'),
-            );
-          }
-          return ListView.separated(
-            itemCount: sequences.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final seq = sequences[index];
-              return ListTile(
-                title: Text(seq.name),
-                subtitle: Text(
-                  'Шагов: ${seq.steps.length} • Раунды: ${seq.rounds}',
-                ),
-                onTap: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => EditSequenceScreen(existingSequence: seq),
-                    ),
-                  );
-                  if (!context.mounted) return;
-                  if (result == 'saved') {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Все хорошо, сохранено')),
-                    );
-                  }
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.play_arrow),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RunSequenceScreen(sequence: seq),
-                          ),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_forever),
-                      onPressed: () async {
-                        await StorageService.deleteSequence(seq.id);
-                      },
-                    ),
-                  ],
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        title: const Text('Тренировки'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: ValueListenableBuilder(
+          valueListenable: Hive.box<TimerSequence>(
+            StorageService.sequencesBoxName,
+          ).listenable(),
+          builder: (context, Box<TimerSequence> box, _) {
+            final sequences = box.values.toList(growable: false);
+            if (sequences.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Нет сохранённых последовательностей',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
                 ),
               );
-            },
-          );
-        },
+            }
+            return ListView.separated(
+              itemCount: sequences.length,
+              separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
+              itemBuilder: (context, index) {
+                final seq = sequences[index];
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15),
+                    child: Text(
+                      '${seq.steps.length}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    seq.name,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    'Шагов: ${seq.steps.length} • Раунды: ${seq.rounds}',
+                  ),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            EditSequenceScreen(existingSequence: seq),
+                      ),
+                    );
+                    if (!context.mounted) return;
+                    if (result == 'saved') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Все хорошо, сохранено')),
+                      );
+                    }
+                  },
+                  trailing: Wrap(
+                    spacing: 4,
+                    children: [
+                      IconButton(
+                        tooltip: 'Запустить',
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => RunSequenceScreen(sequence: seq),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        tooltip: 'Удалить',
+                        icon: const Icon(Icons.delete_outline_rounded),
+                        onPressed: () async {
+                          await StorageService.deleteSequence(seq.id);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.push(
             context,
@@ -92,7 +124,8 @@ class _SequenceListScreenState extends State<SequenceListScreen> {
             );
           }
         },
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Новая'),
       ),
     );
   }

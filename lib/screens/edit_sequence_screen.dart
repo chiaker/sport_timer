@@ -120,18 +120,23 @@ class _EditSequenceScreenState extends State<EditSequenceScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Название'),
+                  decoration: const InputDecoration(
+                    labelText: 'Название',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _roundsController,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: const InputDecoration(
                     labelText: 'Раунды (повторы всей последовательности)',
+                    border: OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -140,6 +145,7 @@ class _EditSequenceScreenState extends State<EditSequenceScreen> {
           const Divider(height: 1),
           Expanded(
             child: ReorderableListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               itemCount: _steps.length,
               onReorder: (oldIndex, newIndex) {
                 setState(() {
@@ -150,29 +156,41 @@ class _EditSequenceScreenState extends State<EditSequenceScreen> {
               },
               itemBuilder: (context, index) {
                 final step = _steps[index];
-                return ListTile(
+                return Card(
                   key: ValueKey('step_$index'),
-                  leading: CircleAvatar(
-                    backgroundColor: Color(step.colorValue),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
                   ),
-                  title: Text(step.label),
-                  subtitle: Text(_formatSeconds(step.durationSeconds)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () => _editStep(index),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            _steps.removeAt(index);
-                          });
-                        },
-                      ),
-                    ],
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Color(step.colorValue),
+                    ),
+                    title: Text(
+                      step.label,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(_formatSeconds(step.durationSeconds)),
+                    trailing: Wrap(
+                      spacing: 4,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => _editStep(index),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          onPressed: () {
+                            setState(() {
+                              _steps.removeAt(index);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -180,9 +198,10 @@ class _EditSequenceScreenState extends State<EditSequenceScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _addStep,
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Добавить шаг'),
       ),
     );
   }
@@ -242,9 +261,12 @@ class _EditStepDialogState extends State<_EditStepDialog> {
           children: [
             TextField(
               controller: _labelController,
-              decoration: const InputDecoration(labelText: 'Название шага'),
+              decoration: const InputDecoration(
+                labelText: 'Название шага',
+                border: OutlineInputBorder(),
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -252,7 +274,10 @@ class _EditStepDialogState extends State<_EditStepDialog> {
                     controller: _minutesController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(labelText: 'Минуты'),
+                    decoration: const InputDecoration(
+                      labelText: 'Минуты',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -263,10 +288,19 @@ class _EditStepDialogState extends State<_EditStepDialog> {
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: const InputDecoration(
                       labelText: 'Секунды (0-59)',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Цвет шага',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -300,7 +334,7 @@ class _EditStepDialogState extends State<_EditStepDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Отмена'),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
             final label = _labelController.text.trim();
             if (label.isEmpty) {
