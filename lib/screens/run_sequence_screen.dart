@@ -35,13 +35,15 @@ class _RunSequenceScreenState extends State<RunSequenceScreen>
       // Rebuild for smooth progress and remaining time
       if (mounted) setState(() {});
     });
-    WakelockPlus.enable();
+    // Guard wakelock to avoid potential plugin errors
+    WakelockPlus.enable().catchError((_) {});
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    WakelockPlus.disable();
+    // Guard wakelock disable
+    WakelockPlus.disable().catchError((_) {});
     super.dispose();
   }
 
