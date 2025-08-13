@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/sequence_list_screen.dart';
 import 'services/storage.dart';
-import 'screens/error_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Hive.initFlutter();
-    await StorageService.initialize();
-    runApp(const STimerApp());
-  } catch (e, st) {
-    runApp(ErrorApp(error: '$e\n$st'));
-  }
+  await Hive.initFlutter();
+  await StorageService.initialize();
+  runApp(const STimerApp());
 }
 
 class STimerApp extends StatelessWidget {
